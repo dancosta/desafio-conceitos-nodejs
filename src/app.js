@@ -39,8 +39,14 @@ app.delete("/repositories/:id", (request, response) => {
   // TODO
 });
 
+//increment the like num of a given repo id
 app.post("/repositories/:id/like", (request, response) => {
-  // TODO
+  const { id } = request.params;
+
+  const repo = repositories.find(repo => repo.id === id);
+  repo.likes++;
+
+  return response.json(repo);
 });
 
 module.exports = app;
