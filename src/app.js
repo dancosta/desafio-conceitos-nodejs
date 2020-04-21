@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 
- const { uuid } = require("uuidv4");
+ const { uuid, isUuid } = require("uuidv4");
 
 const app = express();
 
@@ -9,6 +9,31 @@ app.use(express.json());
 app.use(cors());
 
 const repositories = [];
+
+
+//defining middleware
+
+function validateRepositoryId(request, response, next){
+  const { id } = request.params;
+
+  if (! isUuid(id) ) {
+    return response.status(400).json({error: `Not valid repository id: ${id}`});
+  }
+
+  next();
+}
+
+function isExixtingRepositoryId(request, response, next){
+  const { id } = request.params;
+
+  if ( repositories.findIndex(repo => repo.id === id) < 0) {
+    return response.status(404).json({error: `Repository id ${id} does not exist`});
+  }
+
+  next();
+}
+
+app.use('/repositories/:id', validateRepositoryId);
 
 //list repositories
 app.get("/repositories", (request, response) => {
@@ -40,7 +65,7 @@ app.delete("/repositories/:id", (request, response) => {
 });
 
 //increment the like num of a given repo id
-app.post("/repositories/:id/like", (request, response) => {
+app.post("/repositories/:id/like", isExixtingRepositoryId, (request, response) => {
   const { id } = request.params;
 
   const repo = repositories.find(repo => repo.id === id);
