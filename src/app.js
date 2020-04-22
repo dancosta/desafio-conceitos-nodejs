@@ -23,7 +23,7 @@ function validateRepositoryId(request, response, next){
   next();
 }
 
-function isExixtingRepositoryId(request, response, next){
+function isExistingRepositoryId(request, response, next){
   const { id } = request.params;
 
   if ( repositories.findIndex(repo => repo.id === id) < 0) {
@@ -56,8 +56,27 @@ app.post("/repositories", (request, response) => {
   return response.json(repository);
 });
 
-app.put("/repositories/:id", (request, response) => {
-  // TODO
+//update repositry 
+app.put("/repositories/:id", isExistingRepositoryId, (request, response) => {
+  const { id } = request.params;
+  const { title, url, techs } = request.body;
+  
+  const repoIdx = repositories.findIndex(repo => repo.id = id);
+
+  if (repoIdx >= 0){
+
+    const repository = {
+      id,
+      title,
+      url,
+      techs,
+      likes: repositories[repoIdx].likes
+    }
+
+    repositories[repoIdx] = repository;
+
+    return response.json(repository);
+  }
 });
 
 app.delete("/repositories/:id", (request, response) => {
@@ -65,7 +84,7 @@ app.delete("/repositories/:id", (request, response) => {
 });
 
 //increment the like num of a given repo id
-app.post("/repositories/:id/like", isExixtingRepositoryId, (request, response) => {
+app.post("/repositories/:id/like", isExistingRepositoryId, (request, response) => {
   const { id } = request.params;
 
   const repo = repositories.find(repo => repo.id === id);
