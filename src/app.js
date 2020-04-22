@@ -79,8 +79,16 @@ app.put("/repositories/:id", isExistingRepositoryId, (request, response) => {
   }
 });
 
-app.delete("/repositories/:id", (request, response) => {
-  // TODO
+//delete a repository
+app.delete("/repositories/:id", isExistingRepositoryId, (request, response) => {
+  const { id } = request.params;
+
+  const repoIdx = repositories.findIndex(repo => repo.id === id);
+
+  repositories.splice(repoIdx, 1);
+
+  return response.status(204).send();
+
 });
 
 //increment the like num of a given repo id
